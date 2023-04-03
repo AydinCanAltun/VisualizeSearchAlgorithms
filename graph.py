@@ -16,7 +16,7 @@ class AlgorithmHelper:
           row = list(lines[i].strip())
           for j in range(len(row)):
             if i != j and int(row[j]) > 0:
-              self.graph.add_edge(i, j, weigth = int(row[j]))
+              self.graph.add_edge(i, j, pos = (i+10, j+10), weigth = int(row[j]))
               self.m_adj_list[i].add((j, int(row[j])))
     
     # Print the graph representation
