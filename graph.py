@@ -1,7 +1,6 @@
 from queue import Queue, PriorityQueue
 import networkx as nx
-import numpy as np
-import matplotlib.pyplot as plt
+from visualizer import Visualizer
 
 class AlgorithmHelper:
 
@@ -19,6 +18,7 @@ class AlgorithmHelper:
             if i != j and int(row[j]) > 0:
               self.graph.add_edge(i, j, pos = (i+10, j+10), weigth = int(row[j]))
               self.m_adj_list[i].add((j, int(row[j])))
+        self.visualizer = Visualizer(self.graph)
     
     # Print the graph representation
     def print_adj_list(self):
@@ -30,7 +30,8 @@ class AlgorithmHelper:
         visited = set()
         queue = Queue()
         visited_edges = list()
-        self.show_graph(0, 0, visited_edges=visited_edges, pause=0)
+        title = f"BFS ({start_node},{target_node})"
+        self.visualizer.show_graph(title=title, current_node=0, next_node=0, visited_edges=visited_edges, pause=0)
         # Add the start_node to the queue and visited list
         queue.put(start_node)
         visited.add(start_node)
@@ -49,7 +50,7 @@ class AlgorithmHelper:
             
             for (next_node, weight) in self.m_adj_list[current_node]:
                 if next_node not in visited:
-                    self.show_graph(current_node=current_node, next_node=next_node, visited_edges=visited_edges, pause=0)
+                    self.visualizer.show_graph(title=title, current_node=current_node, next_node=next_node, visited_edges=visited_edges, pause=3)
                     queue.put(next_node)
                     parent[next_node] = current_node
                     visited.add(next_node)
@@ -64,16 +65,23 @@ class AlgorithmHelper:
                 path.append(parent[target_node]) 
                 target_node = parent[target_node]
             path.reverse()
+        input()
         return path 
 
-    def dfs(self, start, target, path = [], visited = set()):
+    def dfs(self, start, target, path = [], visited = set(), visited_edges=list(), is_first_call=True, title=None):
+      if is_first_call:
+          title = f"DFS ({start},{target})"
+          self.visualizer.show_graph(title=title, current_node=start, next_node=target, visited_edges=visited_edges, pause=0)
       path.append(start)
       visited.add(start)
+      
       if start == target:
           return path
       for (neighbour, weight) in self.m_adj_list[start]:
           if neighbour not in visited:
-              result = self.dfs(neighbour, target, path, visited)
+              visited_edges.append((start, neighbour))
+              self.visualizer.show_graph(current_node=start, next_node=neighbour, visited_edges=visited_edges)
+              result = self.dfs(neighbour, target, path, visited, visited_edges=visited_edges, is_first_call=False, title=title)
               if result is not None:
                   return result
       path.pop()
@@ -151,136 +159,3 @@ class AlgorithmHelper:
         #         return True
         return None
     
-    def show_graph(self, current_node, next_node, visited_edges = list(), pause=10):
-        plt.clf()
-        pos=nx.spring_layout(self.graph,seed=5)
-        nx.draw_networkx_nodes(self.graph, pos)
-        nx.draw_networkx_labels(self.graph, pos)
-
-        curved_edges = [edge for edge in self.graph.edges() if reversed(edge) in self.graph.edges()]
-        curved_edge_colors = []
-        for (source, target) in curved_edges:
-            if source == current_node and target == next_node:
-                curved_edge_colors.append('red')
-            elif visited_edges.count((source, target)):
-                curved_edge_colors.append('orange')
-            else:
-                curved_edge_colors.append('black')
-        straight_edges = list(set(self.graph.edges()) - set(curved_edges))
-        straight_edge_colors = []
-        for (source, target) in straight_edges:
-            if source == current_node and target == next_node:
-                straight_edge_colors.append('red')
-            elif visited_edges.count((source, target)):
-                straight_edge_colors.append('orange')
-            else:
-                straight_edge_colors.append('black')
-        nx.draw_networkx_edges(self.graph, pos, edge_color=straight_edge_colors, edgelist=straight_edges, arrowsize=50)
-        arc_rad = 0.25
-        nx.draw_networkx_edges(self.graph, pos, edgelist=curved_edges, edge_color=curved_edge_colors, connectionstyle=f'arc3, rad = {arc_rad}', arrowsize=50)
-        edge_weights = nx.get_edge_attributes(self.graph, 'weigth')
-        curved_edge_labels = {edge: edge_weights[edge] for edge in curved_edges}
-        straight_edge_labels = {edge: edge_weights[edge] for edge in straight_edges}
-        self.my_draw_networkx_edge_labels(self.graph, pos, edge_labels=curved_edge_labels,rotate=False,rad = arc_rad, plt=plt)
-        nx.draw_networkx_edge_labels(self.graph, pos, edge_labels=straight_edge_labels,rotate=False)
-        plt.show(block=False)
-        if pause > 0:
-            plt.pause(pause)
-        else:
-            input("")
-
-    def my_draw_networkx_edge_labels(self,
-        G,
-        pos,
-        edge_labels=None,
-        label_pos=0.5,
-        font_size=10,
-        font_color="k",
-        font_family="sans-serif",
-        font_weight="normal",
-        alpha=None,
-        bbox=None,
-        horizontalalignment="center",
-        verticalalignment="center",
-        ax=None,
-        rotate=True,
-        clip_on=True,
-        rad=0,
-        plt=None
-    ):
-
-        if ax is None:
-            ax = plt.gca()
-        if edge_labels is None:
-            labels = {(u, v): d for u, v, d in G.edges(data=True)}
-        else:
-            labels = edge_labels
-        text_items = {}
-        for (n1, n2), label in labels.items():
-            (x1, y1) = pos[n1]
-            (x2, y2) = pos[n2]
-            (x, y) = (
-                x1 * label_pos + x2 * (1.0 - label_pos),
-                y1 * label_pos + y2 * (1.0 - label_pos),
-            )
-            pos_1 = ax.transData.transform(np.array(pos[n1]))
-            pos_2 = ax.transData.transform(np.array(pos[n2]))
-            linear_mid = 0.5*pos_1 + 0.5*pos_2
-            d_pos = pos_2 - pos_1
-            rotation_matrix = np.array([(0,1), (-1,0)])
-            ctrl_1 = linear_mid + rad*rotation_matrix@d_pos
-            ctrl_mid_1 = 0.5*pos_1 + 0.5*ctrl_1
-            ctrl_mid_2 = 0.5*pos_2 + 0.5*ctrl_1
-            bezier_mid = 0.5*ctrl_mid_1 + 0.5*ctrl_mid_2
-            (x, y) = ax.transData.inverted().transform(bezier_mid)
-
-            if rotate:
-                # in degrees
-                angle = np.arctan2(y2 - y1, x2 - x1) / (2.0 * np.pi) * 360
-                # make label orientation "right-side-up"
-                if angle > 90:
-                    angle -= 180
-                if angle < -90:
-                    angle += 180
-                # transform data coordinate angle to screen coordinate angle
-                xy = np.array((x, y))
-                trans_angle = ax.transData.transform_angles(
-                    np.array((angle,)), xy.reshape((1, 2))
-                )[0]
-            else:
-                trans_angle = 0.0
-            # use default box of white with white border
-            if bbox is None:
-                bbox = dict(boxstyle="round", ec=(1.0, 1.0, 1.0), fc=(1.0, 1.0, 1.0))
-            if not isinstance(label, str):
-                label = str(label)  # this makes "1" and 1 labeled the same
-
-            t = ax.text(
-                x,
-                y,
-                label,
-                size=font_size,
-                color=font_color,
-                family=font_family,
-                weight=font_weight,
-                alpha=alpha,
-                horizontalalignment=horizontalalignment,
-                verticalalignment=verticalalignment,
-                rotation=trans_angle,
-                transform=ax.transData,
-                bbox=bbox,
-                zorder=1,
-                clip_on=clip_on,
-            )
-            text_items[(n1, n2)] = t
-
-        ax.tick_params(
-            axis="both",
-            which="both",
-            bottom=False,
-            left=False,
-            labelbottom=False,
-            labelleft=False,
-        )
-
-        return text_items
