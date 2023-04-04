@@ -1,6 +1,7 @@
 from queue import Queue, PriorityQueue
 import networkx as nx
 import numpy as np
+import matplotlib.pyplot as plt
 
 class AlgorithmHelper:
 
@@ -47,9 +48,46 @@ class AlgorithmHelper:
   
             for (next_node, weight) in self.m_adj_list[current_node]:
                 if next_node not in visited:
+                    plt.clf()
+                    pos=nx.spring_layout(self.graph,seed=5)
+                    nx.draw_networkx_nodes(self.graph, pos)
+                    nx.draw_networkx_labels(self.graph, pos)
+
+                    curved_edges = [edge for edge in self.graph.edges() if reversed(edge) in self.graph.edges()]
+                    print(curved_edges)
+                    curved_edge_colors = []
+                    for (source, target) in curved_edges:
+                        if target in queue.queue:
+                            curved_edge_colors.append('red')
+                        elif target in visited:
+                            curved_edge_colors.append('orange')
+                        else:
+                            curved_edge_colors.append('black')
+                    print(f"curved_edge_colors: {curved_edge_colors}")
+                    straight_edges = list(set(self.graph.edges()) - set(curved_edges))
+                    straight_edge_colors = []
+                    for (source, target) in straight_edges:
+                        if target in queue.queue:
+                            straight_edge_colors.append('red')
+                        elif target in visited:
+                            straight_edge_colors.append('orange')
+                        else:
+                            straight_edge_colors.append('black')                        
+                    print(f"straight_edge_colors: {straight_edge_colors}")
+                    nx.draw_networkx_edges(self.graph, pos, edge_color=straight_edge_colors, edgelist=straight_edges, arrowsize=50)
+                    arc_rad = 0.25
+                    nx.draw_networkx_edges(self.graph, pos, edgelist=curved_edges, edge_color=curved_edge_colors, connectionstyle=f'arc3, rad = {arc_rad}', arrowsize=50)
+                    edge_weights = nx.get_edge_attributes(self.graph, 'weigth')
+                    curved_edge_labels = {edge: edge_weights[edge] for edge in curved_edges}
+                    straight_edge_labels = {edge: edge_weights[edge] for edge in straight_edges}
+                    self.my_draw_networkx_edge_labels(self.graph, pos, edge_labels=curved_edge_labels,rotate=False,rad = arc_rad, plt=plt)
+                    plt.show(block=False)
+                    input()
                     queue.put(next_node)
                     parent[next_node] = current_node
                     visited.add(next_node)
+                    print(f"queue: {list(queue.queue)}")
+                    
                 
         # Path reconstruction
         path = []
