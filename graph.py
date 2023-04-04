@@ -54,7 +54,6 @@ class AlgorithmHelper:
                     nx.draw_networkx_labels(self.graph, pos)
 
                     curved_edges = [edge for edge in self.graph.edges() if reversed(edge) in self.graph.edges()]
-                    print(curved_edges)
                     curved_edge_colors = []
                     for (source, target) in curved_edges:
                         if target in queue.queue:
@@ -63,7 +62,6 @@ class AlgorithmHelper:
                             curved_edge_colors.append('orange')
                         else:
                             curved_edge_colors.append('black')
-                    print(f"curved_edge_colors: {curved_edge_colors}")
                     straight_edges = list(set(self.graph.edges()) - set(curved_edges))
                     straight_edge_colors = []
                     for (source, target) in straight_edges:
@@ -72,7 +70,7 @@ class AlgorithmHelper:
                         elif target in visited:
                             straight_edge_colors.append('orange')
                         else:
-                            straight_edge_colors.append('black')                        
+                            straight_edge_colors.append('black')                
                     print(f"straight_edge_colors: {straight_edge_colors}")
                     nx.draw_networkx_edges(self.graph, pos, edge_color=straight_edge_colors, edgelist=straight_edges, arrowsize=50)
                     arc_rad = 0.25
@@ -81,6 +79,7 @@ class AlgorithmHelper:
                     curved_edge_labels = {edge: edge_weights[edge] for edge in curved_edges}
                     straight_edge_labels = {edge: edge_weights[edge] for edge in straight_edges}
                     self.my_draw_networkx_edge_labels(self.graph, pos, edge_labels=curved_edge_labels,rotate=False,rad = arc_rad, plt=plt)
+                    nx.draw_networkx_edge_labels(self.graph, pos, edge_labels=straight_edge_labels,rotate=False)
                     plt.show(block=False)
                     input()
                     queue.put(next_node)
@@ -97,8 +96,6 @@ class AlgorithmHelper:
                 path.append(parent[target_node]) 
                 target_node = parent[target_node]
             path.reverse()
-            print(f"BFS Parent : {parent}")
-            print(f"BFS Visited : {visited}")
         return path 
 
     def dfs(self, start, target, path = [], visited = set()):
