@@ -45,7 +45,7 @@ class AlgorithmHelper:
         while not queue.empty():
             current_node = queue.get()
             if current_node == target_node:
-                self.visualizer.show_graph(title=title, current_node=parent[start_node], visited_edges=visited_edges, pause=0)
+                self.visualizer.show_graph(title=title, current_node=parent[current_node], next_node=current_node, visited_edges=visited_edges, pause=0)
                 path_found = True
                 break
             
