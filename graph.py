@@ -104,14 +104,12 @@ class AlgorithmHelper:
 
         return None
     
-
     def dls(self, deep_limit, start, target, path = [], visited = set()):
         path.append(start)
         visited.add(start)
         if start == target:
             return path
         elif deep_limit == 0:
-            path.pop()
             return None
         else:
             for (neighbour, weight) in self.m_adj_list[start]:
@@ -120,42 +118,60 @@ class AlgorithmHelper:
                     if result is not None:
                         return result
             path.pop()
-        return None
+            return None
     
-    def bidirectional_search(self, start, goal):
-        # create two sets to track visited nodes
-        visited_forward = set()
-        visited_backward = set()
-        # create two queues for BFS
-        queue_forward = [start]
-        queue_backward = [goal]
-
-        forwardPath = self.bfs(start, goal)
-        if goal in forwardPath:
-            return forwardPath
-        
-        backwardPath = self.bfs(goal, start)
-        if start in backwardPath:
-            return backwardPath
-       
-        # while queue_forward and queue_backward:
-        #     # perform BFS from the forward direction
-        #     current_forward = queue_forward.pop(0)
-        #     visited_forward.add(current_forward)
-        #     for (neighbor, weight) in self.m_adj_list[current_forward]:
-        #         if neighbor not in visited_forward:
-        #             queue_forward.append(neighbor)
-        #     # check if the current node has been visited in the backward search
-        #     if current_forward in visited_backward:
-        #         return True
-        #     # perform BFS from the backward direction
-        #     current_backward = queue_backward.pop(0)
-        #     visited_backward.add(current_backward)
-        #     for neighbor in graph[current_backward]:
-        #         if neighbor not in visited_backward:
-        #             queue_backward.append(neighbor)
-        #     # check if the current node has been visited in the forward search
-        #     if current_backward in visited_forward:
-        #         return True
+    def iddfs (self, start, goal, depth):
+        for limit in range(0, depth):
+            path = self.dls(limit, start, goal)
+            if path is not None:
+                return path
         return None
+
+    def bidirectional_search(self, start, goal):
+        forward_queue = Queue()
+        forward_queue.put(start)
+
+        backward_queue = Queue()
+        backward_queue.put(goal)
+      
+        forward_visited = {start: None}
+        backward_visited = {goal: None}
+    
+        while not forward_queue.empty() and not backward_queue.empty():
+            # ileri arama
+            current = forward_queue.get()
+            if current in backward_visited:
+                return self.path(forward_visited, backward_visited, current)
+              
+            for (neighbor,weight) in self.m_adj_list[current]:
+                if neighbor not in forward_visited:
+                    forward_visited[neighbor] = current
+                    forward_queue.put(neighbor)
+    
+            # geri arama
+            current = backward_queue.get()
+            if current in forward_visited:
+              return self.path(forward_visited, backward_visited, current)
+                
+            for (neighbor,weight) in self.m_adj_list[current]:
+                if neighbor not in backward_visited:
+                    backward_visited[neighbor] = current
+                    backward_queue.put(neighbor)
+                  
+        return None
+
+    def path(self, forward_visited, backward_visited, current):
+        forward_path = []
+        node = forward_visited[current]
+        while node is not None:
+            forward_path.append(node)
+            node = forward_visited[node]
+          
+        backward_path = []
+        node = current
+        while node is not None:
+            backward_path.append(node)
+            node = backward_visited[node]
+          
+        return forward_path[::-1] + backward_path
     
