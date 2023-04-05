@@ -5,7 +5,7 @@ from visualizer import Visualizer
 class AlgorithmHelper:
 
     def __init__(self, filePath, directed=True):
-        with open('matris.txt', 'r') as f:
+        with open(filePath, 'r') as f:
           lines = f.readlines()
         self.graph = nx.DiGraph()
         self.m_num_of_nodes = len(lines)
