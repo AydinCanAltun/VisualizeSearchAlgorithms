@@ -88,20 +88,24 @@ class AlgorithmHelper:
       return None    
 
     def ucs(self, start, goal):
+        visited_edges = list()
         explored = set()
+        self.visualizer.show_graph(current_node=start,next_node=start, visited_edges=visited_edges, pause=0)
         pq = PriorityQueue()
         pq.put((0, start, [start]))
 
         while not pq.empty():
             cost, node, path = pq.get()
             if node == goal:
+                self.visualizer.show_graph(current_node=path[len(path)-2],next_node=node, visited_edges=visited_edges, pause=0)
                 return path
             if node not in explored:
                 explored.add(node)
                 for neighbor, weight in self.m_adj_list[node]:
                     if neighbor not in explored:
+                        self.visualizer.show_graph(current_node=node, next_node=neighbor, visited_edges=visited_edges, pause=3)
+                        visited_edges.append((node, neighbor))
                         pq.put((cost + weight, neighbor, path + [neighbor]))
-
         return None
     
     def dls(self, deep_limit, start, target, path = [], visited = set()):

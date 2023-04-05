@@ -3,7 +3,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import time
 
-g = AlgorithmHelper('matrix.txt')
+g = AlgorithmHelper('matris.txt')
 #print(f"bfs result: {g.bfs(3, 5)}")
-print(f"dfs result: {g.dfs(0, 1)}")
-
+#print(f"dfs result: {g.dfs(0, 1)}")
+print(f"ucs result : {g.ucs(3, 5)}")
