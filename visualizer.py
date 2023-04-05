@@ -44,7 +44,7 @@ class Visualizer:
         if pause > 0:
             plt.pause(pause)
         else:
-            input("")
+            input("Devam etmek ister misin ?")
 
     def my_draw_networkx_edge_labels(self,
         G,
