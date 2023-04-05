@@ -90,6 +90,7 @@ class AlgorithmHelper:
     def ucs(self, start, goal):
         visited_edges = list()
         explored = set()
+        title = f"UCS ({start},{goal})"
         self.visualizer.show_graph(current_node=start,next_node=start, visited_edges=visited_edges, pause=0)
         pq = PriorityQueue()
         pq.put((0, start, [start]))
@@ -97,24 +98,25 @@ class AlgorithmHelper:
         while not pq.empty():
             cost, node, path = pq.get()
             if node == goal:
-                self.visualizer.show_graph(current_node=path[len(path)-2],next_node=node, visited_edges=visited_edges, pause=0)
+                self.visualizer.show_graph(title=title,current_node=path[len(path)-2],next_node=node, visited_edges=visited_edges, pause=0)
                 return path
             if node not in explored:
                 explored.add(node)
                 for neighbor, weight in self.m_adj_list[node]:
                     if neighbor not in explored:
-                        self.visualizer.show_graph(current_node=node, next_node=neighbor, visited_edges=visited_edges, pause=3)
+                        self.visualizer.show_graph(title=title,current_node=node, next_node=neighbor, visited_edges=visited_edges, pause=3)
                         visited_edges.append((node, neighbor))
                         pq.put((cost + weight, neighbor, path + [neighbor]))
         return None
     
-    def dls(self, deep_limit, start, target, path = [], visited = set(), is_first_call=True, visited_edges=list()):
+    def dls(self, deep_limit, start, target, path = [], visited = set(), is_first_call=True, visited_edges=list(),title=None):
         if is_first_call:
-            self.visualizer.show_graph(current_node=start,next_node=start,visited_edges=visited_edges,pause=0)
+            title = f"DLS ({start},{target})"
+            self.visualizer.show_graph(title=title,current_node=start,next_node=start,visited_edges=visited_edges,pause=0)
         path.append(start)
         visited.add(start)
         if start == target:
-            self.visualizer.show_graph(current_node=path[len(path)-2],next_node=start,visited_edges=visited_edges,pause=0)
+            self.visualizer.show_graph(title=title,current_node=path[len(path)-2],next_node=start,visited_edges=visited_edges,pause=0)
             return path
         elif deep_limit == 0:
             return None
@@ -122,7 +124,7 @@ class AlgorithmHelper:
             for (neighbour, weight) in self.m_adj_list[start]:
                 if neighbour not in visited:
                     visited_edges.append((start, neighbour))
-                    self.visualizer.show_graph(current_node=start, next_node=neighbour, visited_edges=visited_edges, pause=3)
+                    self.visualizer.show_graph(title=title,current_node=start, next_node=neighbour, visited_edges=visited_edges, pause=3)
                     result = self.dls(deep_limit - 1, neighbour, target, path, visited, is_first_call=False, visited_edges=visited_edges)
                     if result is not None:
                         return result
