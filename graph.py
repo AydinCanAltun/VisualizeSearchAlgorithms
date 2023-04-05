@@ -70,7 +70,8 @@ class AlgorithmHelper:
 
     def dfs(self, start, target, path = [], visited = set(), visited_edges=list(), is_first_call=True, title=None):
       if is_first_call:
-          title = f"DFS ({start},{target})"
+          if title is None:
+            title = f"DFS ({start},{target})"
           self.visualizer.show_graph(title=title, current_node=start, next_node=target, visited_edges=visited_edges, pause=0)
       path.append(start)
       visited.add(start)
@@ -111,7 +112,8 @@ class AlgorithmHelper:
     
     def dls(self, deep_limit, start, target, path = [], visited = set(), is_first_call=True, visited_edges=list(),title=None):
         if is_first_call:
-            title = f"DLS ({start},{target})"
+            if title is None:
+                title = f"DLS ({start},{target})"
             self.visualizer.show_graph(title=title,current_node=start,next_node=start,visited_edges=visited_edges,pause=0)
         path.append(start)
         visited.add(start)
