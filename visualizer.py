@@ -45,6 +45,38 @@ class Visualizer:
             plt.pause(pause)
         else:
             input("Devam etmek ister misin ?")
+    
+    def show_basic_graph(self, title=None, pause=3):
+        plt.clf()
+        if title != None:
+            plt.title(title)
+        pos=nx.spring_layout(self.graph,seed=5)
+        nx.draw_networkx_nodes(self.graph, pos)
+        nx.draw_networkx_labels(self.graph, pos)
+
+        curved_edges = [edge for edge in self.graph.edges() if reversed(edge) in self.graph.edges()]
+        curved_edge_colors = []
+        for (source, target) in curved_edges:
+            curved_edge_colors.append('black')
+                
+        straight_edges = list(set(self.graph.edges()) - set(curved_edges))
+        straight_edge_colors = []
+        for (source, target) in straight_edges:
+            straight_edge_colors.append('black')
+                
+        nx.draw_networkx_edges(self.graph, pos, edge_color=straight_edge_colors, edgelist=straight_edges, arrowsize=50)
+        arc_rad = 0.25
+        nx.draw_networkx_edges(self.graph, pos, edgelist=curved_edges, edge_color=curved_edge_colors, connectionstyle=f'arc3, rad = {arc_rad}', arrowsize=50)
+        edge_weights = nx.get_edge_attributes(self.graph, 'weigth')
+        curved_edge_labels = {edge: edge_weights[edge] for edge in curved_edges}
+        straight_edge_labels = {edge: edge_weights[edge] for edge in straight_edges}
+        self.my_draw_networkx_edge_labels(self.graph, pos, edge_labels=curved_edge_labels,rotate=False,rad = arc_rad, plt=plt)
+        nx.draw_networkx_edge_labels(self.graph, pos, edge_labels=straight_edge_labels,rotate=False)
+        plt.show(block=False)
+        if pause > 0:
+            plt.pause(pause)
+        else:
+            input("Devam etmek ister misin ?")
 
     def my_draw_networkx_edge_labels(self,
         G,

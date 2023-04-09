@@ -10,7 +10,7 @@ customtkinter.set_default_color_theme("green");
 root=customtkinter.CTk()
 root.geometry("500x700")
 
-g = AlgorithmHelper('matris.txt')
+g = AlgorithmHelper('matrix.txt')
 def bfs():print(f"bfs result: {g.bfs(3, 5)}")
 def dfs():print(f"dfs result: {g.dfs(0, 1)}")
 def ucs():print(f"ucs result : {g.ucs(3, 5)}")

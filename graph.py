@@ -31,7 +31,7 @@ class AlgorithmHelper:
         queue = Queue()
         visited_edges = list()
         title = f"BFS ({start_node},{target_node})"
-        self.visualizer.show_graph(title=title, current_node=0, next_node=0, visited_edges=visited_edges, pause=0)
+        self.visualizer.show_basic_graph(title=title, pause=0)
         # Add the start_node to the queue and visited list
         queue.put(start_node)
         visited.add(start_node)

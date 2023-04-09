@@ -1,0 +1,14 @@
+= Visualize Search Algorithms
+
+Visualize Search Algorithms is a simple python code that implement and visualize step by step BFS, DFS, UCS, Depth Limited Search, Iterative Deeping DFS, Bidirectional Search algorithms.
+
+This project build by Aydın Can Altun, Ege Özeren, Emre Yelbey, Osman Şimşek and Yener Emin Elibol.
+
+== Dependencies
+In order to run this project you should install these pip packages
+
+* networkx
+* matplotlib
+* numpy
+* customtkinter
+
