@@ -127,3 +127,12 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+VisualizeSearchAlgorithms.pyproj
+.vs/ProjectSettings.json
+.vs/slnx.sqlite
+.vs/VSWorkspaceState.json
+.gitignore
+.vs/VisualizeSearchAlgorithms/FileContentIndex/9a79e34b-fb2f-48de-b52f-ae27c4c275aa.vsidx
+.vs/VisualizeSearchAlgorithms/FileContentIndex/read.lock
+.vs/VisualizeSearchAlgorithms/v17/.suo
+.vs/VisualizeSearchAlgorithms/v17/.wsuo
