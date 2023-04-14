@@ -31,10 +31,11 @@ class AlgorithmHelper:
         queue = Queue()
         visited_edges = list()
         title = f"BFS ({start_node},{target_node})"
-        self.visualizer.show_basic_graph(title=title, pause=0)
+        self.visualizer.visualize_graph(title=title, draw_curved_edges=False, wait_for_action=True)
         # Add the start_node to the queue and visited list
         queue.put(start_node)
         visited.add(start_node)
+        self.visualizer.color_nodes(title=title, current_node=start_node, next_node=start_node, queue=queue, draw_curved_edges=False, pause=3)
     
         # start_node has not parents
         parent = dict()
@@ -45,14 +46,13 @@ class AlgorithmHelper:
         while not queue.empty():
             current_node = queue.get()
             if current_node == target_node:
-                self.visualizer.show_graph(title=title, current_node=parent[current_node], next_node=current_node, visited_edges=visited_edges, pause=0)
                 path_found = True
                 break
             
             for (next_node, weight) in self.m_adj_list[current_node]:
                 if next_node not in visited:
-                    self.visualizer.show_graph(title=title, current_node=current_node, next_node=next_node, visited_edges=visited_edges, pause=3)
                     queue.put(next_node)
+                    self.visualizer.color_nodes(title=title, current_node=current_node, next_node=next_node, draw_curved_edges=False, queue=queue, pause=3)
                     parent[next_node] = current_node
                     visited.add(next_node)
                     visited_edges.append((current_node, next_node))
@@ -72,7 +72,7 @@ class AlgorithmHelper:
         if is_first_call:
             if title is None:
                 title = f"DFS ({start},{target})"
-            self.visualizer.show_graph(title=title, current_node=start, next_node=target, visited_edges=visited_edges, pause=0)
+            self.visualizer.visualize_graph(title=title, draw_curved_edges=False, wait_for_action=True)
         path.append(start)
         visited.add(start)
       
@@ -81,7 +81,7 @@ class AlgorithmHelper:
         for (neighbour, weight) in self.m_adj_list[start]:
             if neighbour not in visited:
                 visited_edges.append((start, neighbour))
-                self.visualizer.show_graph(current_node=start, next_node=neighbour, visited_edges=visited_edges)
+                self.visualizer.show_graph(current_node=start, next_node=neighbour, draw_curved_edges=False, visited_edges=visited_edges)
                 result = self.dfs(neighbour, target, path, visited, visited_edges=visited_edges, is_first_call=False, title=title)
                 if result is not None:
                     return result
@@ -92,14 +92,13 @@ class AlgorithmHelper:
         visited_edges = list()
         explored = set()
         title = f"UCS ({start},{goal})"
-        self.visualizer.show_graph(current_node=start,next_node=start, visited_edges=visited_edges, pause=0)
+        self.visualizer.visualize_graph(title=title, wait_for_action=True)
         pq = PriorityQueue()
         pq.put((0, start, [start]))
 
         while not pq.empty():
             cost, node, path = pq.get()
             if node == goal:
-                self.visualizer.show_graph(title=title,current_node=path[len(path)-2],next_node=node, visited_edges=visited_edges, pause=0)
                 return path
             if node not in explored:
                 explored.add(node)
@@ -108,19 +107,18 @@ class AlgorithmHelper:
                         self.visualizer.show_graph(title=title,current_node=node, next_node=neighbor, visited_edges=visited_edges, pause=3)
                         visited_edges.append((node, neighbor))
                         pq.put((cost + weight, neighbor, path + [neighbor]))
+                        print(pq.queue)
         return None
     
     def dls(self, deep_limit, start, target, path = [], visited = set(), is_first_call=True, visited_edges=list(),title=None, show_graph=True):
         if is_first_call:
             if title is None:
-                title = f"DLS ({start},{target})"
+                title = f"DLS ({start},{target}) Deep Limit = {deep_limit}"
             if show_graph:
                 self.visualizer.show_graph(title=title,current_node=start,next_node=start,visited_edges=visited_edges,pause=0)
         path.append(start)
         visited.add(start)
         if start == target:
-            if show_graph:
-                self.visualizer.show_graph(title=title,current_node=path[len(path)-2],next_node=start,visited_edges=visited_edges,pause=0)
             return path
         elif deep_limit == 0:
             return None
@@ -130,16 +128,18 @@ class AlgorithmHelper:
                     visited_edges.append((start, neighbour))
                     if show_graph:
                         self.visualizer.show_graph(title=title,current_node=start, next_node=neighbour, visited_edges=visited_edges, pause=3)
-                    result = self.dls(deep_limit - 1, neighbour, target, path, visited, is_first_call=False, visited_edges=visited_edges, show_graph=show_graph)
+                    result = self.dls(deep_limit - 1, neighbour, target, path, visited, is_first_call=False, visited_edges=visited_edges, show_graph=show_graph, title=title)
                     if result is not None:
                         return result
             path.pop()
             return None
     
     def iddfs (self, start, goal, depth):
-        self.visualizer.show_graph(current_node=start, next_node=start, visited_edges=list(), pause=0)
+        title = f"IDDFS ({start}, {goal}) Maximum Depth Limit = {depth}"
+        self.visualizer.visualize_graph(title=title, wait_for_action=True)
         for limit in range(0, depth + 1):
-            path = self.dls(limit, start, goal, visited=set(), path=[], is_first_call=False, show_graph=True)
+            title= f"IDDFS ({start}, {goal}), Current Depth = {limit}, Maximum Depth Limit = {depth}"
+            path = self.dls(limit, start, goal, visited=set(), path=[], is_first_call=False, show_graph=True, title=title)
             if path is not None:
                 return path
         return None
@@ -173,8 +173,6 @@ class AlgorithmHelper:
             current = backward_queue.get()
             if current in forward_visited:
               path = self.path(forward_visited, backward_visited, current)
-              print(f"path[current] = {path[current]}, next_node = {current}")
-              self.visualizer.show_graph(current_node=path[current], next_node=current, visited_edges=visited_edges,pause=0)
               return path
                 
             for (neighbor,weight) in self.m_adj_list[current]:

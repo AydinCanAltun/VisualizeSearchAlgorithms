@@ -11,4 +11,5 @@ In order to run this project you should install these pip packages
 * matplotlib
 * numpy
 * customtkinter
+* CTkMessagebox
 
