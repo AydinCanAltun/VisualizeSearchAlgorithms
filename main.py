@@ -6,7 +6,7 @@ from CTkMessagebox import CTkMessagebox
 import customtkinter as tk
 import os
 
-os.environ["PATH"] += os.pathsep + "C:\Program Files\Graphviz\\bin\\"
+#os.environ["PATH"] += os.pathsep + "C:\Program Files\Graphviz\\bin\\"
 
 tk.set_appearance_mode("dark");
 tk.set_default_color_theme("green");
@@ -26,20 +26,20 @@ def show_path(title, path):
     g.visualizer.close_plot()
 
 def bfs():
-    path = g.bfs(3, 5)
-    title = "BFS (3, 5)"
+    path = g.bfs(0, 10)
+    title = "BFS (0, 10)"
     show_path(title, path)
 def dfs():
-    path = g.dfs(3, 5)
-    title = "DFS (3, 5)"
+    path = g.dfs(0, 10)
+    title = "DFS (0, 10)"
     show_path(title, path)
 def ucs():
-    path = g.ucs(3, 5)
-    title = "UCS (3, 5)"
+    path = g.ucs(0, 10)
+    title = "UCS (0, 10)"
     show_path(title, path)
 def dls():
-    path = g.dls(deep_limit=4, start=3, target=5)
-    title = "DLS (3, 5) Deep Limit = 4"
+    path = g.dls(deep_limit=4, start=0, target=10)
+    title = "DLS (0, 10) Deep Limit = 4"
     show_path(title, path)
 def iddfs():
     path = g.iddfs(0, 10, 1)

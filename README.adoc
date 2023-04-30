@@ -12,4 +12,5 @@ In order to run this project you should install these pip packages
 * numpy
 * customtkinter
 * CTkMessagebox
-
+* pydot
+* graphviz

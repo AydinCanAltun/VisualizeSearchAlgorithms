@@ -161,11 +161,19 @@ class Visualizer:
         plt.show(block=False)
         input("Devam etmek ister misin ?")
 
-    def show_graph(self, title=None, current_node=None, next_node=None, visited_edges = list(), draw_curved_edges=True, pause=3):
+    def color_node_with_visited_edges(self, title=None, current_node=None, next_node=None, visited_edges = list(), draw_curved_edges=True, pause=3):
         plt.clf()
         if title != None:
             plt.title(title)
-        nx.draw_networkx_nodes(self.graph, self.pos)
+        node_colors = []
+        for node in self.graph.nodes:
+            if node == current_node:
+                node_colors.append('red')
+            elif self.__in_visited_edges(node, 0, visited_edges):
+                node_colors.append('orange')
+            else:
+                node_colors.append('blue') 
+        nx.draw_networkx_nodes(self.graph, self.pos, node_color=node_colors)
         nx.draw_networkx_labels(self.graph, self.pos)
         if draw_curved_edges:
             curved_edges = [edge for edge in self.graph.edges() if reversed(edge) in self.graph.edges()]
@@ -204,7 +212,7 @@ class Visualizer:
                     edge_colors.append('orange')
                 else:
                     edge_colors.append('black')
-            nx.draw_networkx_edges(self.graph, self.pos, edge_color=edges, edgelist=edge_colors, arrowsize=50)
+            nx.draw_networkx_edges(self.graph, self.pos, edge_color=edge_colors, edgelist=edges, arrowsize=50)
             edge_weights = nx.get_edge_attributes(self.graph, 'weigth')
             nx.draw_networkx_edge_labels(self.graph, self.pos, edge_labels=edge_weights,rotate=False)
         plt.show(block=False)
@@ -220,6 +228,12 @@ class Visualizer:
                 return True
         return False
     
+    def __in_visited_edges(self, searchObject, index, list):
+        for edge in list:
+            if searchObject == edge[index]:
+                return True
+        return False
+
     def my_draw_networkx_edge_labels(self,
         G,
         pos,
@@ -315,6 +329,66 @@ class Visualizer:
         )
 
         return text_items
-    
+
+    def color_multiple_node(self, title=None, current_node=None, next_node={}, forward_nodes={}, backward_nodes=None, draw_curved_edges=True, pause=3):
+        plt.clf()
+
+        if title != None:
+            plt.title(title)
+        node_colors = []
+        for node in self.graph.nodes:
+            if (node in forward_nodes.keys()) and (node in backward_nodes.keys()):
+                node_colors.append('green')
+            elif node in forward_nodes.keys():
+                node_colors.append('red')
+            elif node in backward_nodes.keys():
+                node_colors.append('yellow')
+            else:
+                node_colors.append('blue')
+
+        nx.draw_networkx_nodes(self.graph, self.pos, node_color=node_colors)
+        nx.draw_networkx_labels(self.graph, self.pos)
+
+        if draw_curved_edges:
+            curved_edges = [edge for edge in self.graph.edges() if reversed(edge) in self.graph.edges()]
+            curved_edge_colors = []
+            for (source, target) in curved_edges:
+                if source == current_node and target == next_node:
+                    curved_edge_colors.append('red')
+                else:
+                    curved_edge_colors.append('black')
+            
+            straight_edges = list(set(self.graph.edges()) - set(curved_edges))
+            straight_edge_colors = []
+            for (source, target) in straight_edges:
+                if source == current_node and target == next_node:
+                    straight_edge_colors.append('red')
+                else:
+                    straight_edge_colors.append('black')
+            nx.draw_networkx_edges(self.graph, self.pos, edge_color=straight_edge_colors, edgelist=straight_edges, arrowsize=50)
+            arc_rad = 0.25
+            nx.draw_networkx_edges(self.graph, self.pos, edgelist=curved_edges, edge_color=curved_edge_colors, connectionstyle=f'arc3, rad = {arc_rad}', arrowsize=50)
+            edge_weights = nx.get_edge_attributes(self.graph, 'weigth')
+            curved_edge_labels = {edge: edge_weights[edge] for edge in curved_edges}
+            straight_edge_labels = {edge: edge_weights[edge] for edge in straight_edges}
+            self.my_draw_networkx_edge_labels(self.graph, self.pos, edge_labels=curved_edge_labels,rotate=False,rad = arc_rad, plt=plt)
+            nx.draw_networkx_edge_labels(self.graph, self.pos, edge_labels=straight_edge_labels,rotate=False)
+        else:
+            edges = self.graph.edges()
+            edge_colors = []
+            for (source, target) in edges:
+                if source == current_node and target == next_node:
+                    edge_colors.append('red')
+                else:
+                    edge_colors.append('black')
+            edge_labels = nx.get_edge_attributes(self.graph, 'weigth')
+            nx.draw_networkx_edges(self.graph, self.pos, edge_color=edge_colors, edgelist=edges, arrowsize=50)
+            nx.draw_networkx_edge_labels(self.graph, self.pos, edge_labels=edge_labels,rotate=False)
+        plt.show(block=False)
+        if pause is None:
+            input("Devam etmek ister misin ?")
+        else:
+            plt.pause(pause)
+        
     def close_plot(self):
         plt.close()
