@@ -74,7 +74,7 @@ class AlgorithmHelper:
         for (current, neighbour) in self.graph.edges(start):
             if neighbour not in visited:
                 visited_edges.append((start, neighbour))
-                self.visualizer.color_node_with_visited_edges(current_node=start, next_node=neighbour, draw_curved_edges=False, visited_edges=visited_edges)
+                self.visualizer.color_node_with_visited_edges(title=title, current_node=start, next_node=neighbour, draw_curved_edges=False, visited_edges=visited_edges)
                 result = self.dfs(neighbour, target, path, visited, visited_edges=visited_edges, is_first_call=False, title=title)
                 if result is not None:
                     return result
